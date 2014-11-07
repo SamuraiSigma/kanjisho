@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+"""Main module; reads initial data and executes program"""
+
 import os
 import sys
 import subprocess
@@ -14,6 +16,7 @@ jisho = {}
 
 
 def read_kanji(name):
+    """Reads info about kanji in "name" file"""
     with open(name, "r") as _file:
         i = 0
         data = []
@@ -40,6 +43,7 @@ def read_kanji(name):
 
 
 def search():
+    """Dictionary mode, where kanji previously read can be searched"""
     while True:
         x = input("Type in something to search for it: ")
 
@@ -81,6 +85,7 @@ def search():
 
 
 def clear_screen():
+    """Uses the 'clear' option from the OS"""
     if sys.platform == "linux":
         subprocess.call("clear")
     elif sys.platform == "win32":

@@ -1,9 +1,14 @@
+"""Contains code related to the Kanji class"""
+
 SEPARATOR = " / "
 
 
 class Kanji():
 
+    """Contains information about a kanji, such as reading and meaning"""
+
     def __init__(self, _data):
+        """Recieves a data list and creates a Kanji object"""
         data = list(_data)
         data.reverse()
 
@@ -14,6 +19,7 @@ class Kanji():
         self._onyomi = data.pop()
 
     def __call__(self):
+        """Shows a kanji's attributes in an organized way"""
         print(self.symbol)
         print("Meaning:", SEPARATOR.join(self.meaning))
         print("Strokes:", str(self.strokes))
