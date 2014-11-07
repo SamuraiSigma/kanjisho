@@ -1,35 +1,100 @@
 #!/usr/bin/python3
 
+import os
 import sys
+import subprocess
+import romkan
 from kanji import Kanji
 
+# Directory containing kanji files
+DIR = sys.path[0] + "/data/"
+
+# Global dict
 jisho = {}
 
 
 def read_kanji(name):
     with open(name, "r") as _file:
-        try:
-            while True:
-                data = []
+        i = 0
+        data = []
+        for line in _file:
 
-                # Reads info about the kanji
-                data.append(_file.readline().rstrip("\n"))
-                data.append((_file.readline().rstrip("\n")).split(";"))
-                data.append(int(_file.readline()))
-                data.append((_file.readline().rstrip("\n")).split(";"))
-                data.append((_file.readline().rstrip("\n")).split(";"))
+            # Skips empty or commented lines
+            if line == "\n" or line.startswith('#'):
+                continue
 
+            # Reads info about the kanji
+            if i == 0:
+                data.append(line.rstrip('\n'))
+            elif i == 1 or i == 3 or i == 4:
+                data.append((line.rstrip('\n')).split(';'))
+            else:
+                data.append(int(line))
+            i += 1
+
+            # Adds kanji to dict
+            if i == 5:
                 jisho[data[0]] = Kanji(data)
-        except ValueError:
-            pass
+                del(data[:])
+                i -= 5
 
 
-for _file in sys.argv[1:]:
-    read_kanji(_file)
+def search():
+    while True:
+        x = input("Type in something to search for it: ")
 
-while True:
-    x = input("Type in a kanji to search for it: ")
-    if x in jisho:
-        jisho[x]()
-    else:
-        print(x, "not found...")
+        if x.startswith('%'):
+            x = romkan.to_hiragana(x[1:])
+
+        if x.startswith('@'):
+            x = romkan.to_katakana(x[1:])
+
+        if x == "#exit":
+            break
+
+        elif x == "#all":
+            clear_screen()
+            i = 0
+            for kanji in jisho:
+                jisho[kanji]()
+                i += 1
+                if i % 6 == 0:
+                    input()
+                    clear_screen()
+            input()
+            clear_screen()
+
+        elif x == "#clear":
+            clear_screen()
+
+        elif x in jisho:
+            jisho[x]()
+
+        else:
+            for kanji in jisho:
+                if x in jisho[kanji].meaning:
+                    print(kanji, "=", x)
+                elif x in jisho[kanji].kunyomi:
+                    print(kanji, "->", x)
+                elif x in jisho[kanji].onyomi:
+                    print(kanji, "~>", x)
+
+
+def clear_screen():
+    if sys.platform == "linux":
+        subprocess.call("clear")
+    elif sys.platform == "win32":
+        subprocess.call("cls", shell=True)
+
+
+# -------------------------------------------------------------------
+
+try:
+    for txt in os.listdir(DIR):
+        read_kanji(DIR + txt)
+    search()
+
+# Ctrl-C
+except KeyboardInterrupt:
+    print()
+    exit(1)
