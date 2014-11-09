@@ -2,7 +2,6 @@
 
 SEPARATOR = " / "
 
-
 class Kanji():
 
     """Contains information about a kanji, such as reading and meaning"""

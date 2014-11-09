@@ -6,78 +6,38 @@ import subprocess
 import romkan
 from kanji import Kanji
 
-OP_CHAR = '#'  # Char used for dictionary special options.
 
-
-def search(jisho):
+def search(jisho, rounds, verbose):
     """Dictionary mode, where kanji previously read can be searched"""
-    while True:
-        x = input("Type in something to search for it: ")
-
-        if x == OP_CHAR:
-            options()
-
-        elif x == OP_CHAR + "exit":
-            break
-
-        elif x == OP_CHAR + "all":
-            clear_screen()
-            i = 0
-            for kanji in jisho:
-                jisho[kanji]()
-                i += 1
-                if i % 6 == 0:
-                    input()
-                    clear_screen()
-            input()
-            clear_screen()
-
-        elif x == OP_CHAR + "clear":
-            clear_screen()
-
-        elif x == OP_CHAR + "game":
-            game(jisho)
-
-        elif x in jisho:
-            jisho[x]()
-
-        else:
-            hiragana = romkan.to_hiragana(x)
-            katakana = romkan.to_katakana(x)
-            for kanji in jisho:
-                if x in jisho[kanji].meaning:
-                    print(kanji, "=", x)
-                elif hiragana in jisho[kanji].kunyomi:
-                    print(kanji, "->", hiragana)
-                elif katakana in jisho[kanji].onyomi:
-                    print(kanji, "~>", katakana)
+    if rounds > 0:
+        game(jisho, rounds)
+    else:
+        for x in sys.argv[1:]:
+            if x in jisho:
+                jisho[x]()
+            else:
+                hiragana = romkan.to_hiragana(x)
+                katakana = romkan.to_katakana(x)
+                for kanji in jisho:
+                    if x in jisho[kanji].meaning:
+                        if verbose is False:
+                            print(kanji, "=", x)
+                        else:
+                            jisho[kanji]()
+                    elif hiragana in jisho[kanji].kunyomi:
+                        if verbose is False:
+                            print(kanji, "->", hiragana)
+                        else:
+                            jisho[kanji]()
+                    elif katakana in jisho[kanji].onyomi:
+                        if verbose is False:
+                            print(kanji, "~>", katakana)
+                        else:
+                            jisho[kanji]()
 
 
-def options():
-    """Shows all extra options available in the dictionary"""
-    print("Use '" + OP_CHAR + "' before each of these commands:\n")
-    print("- all: Shows all kanji inside the dictionary.")
-    print("- clear: Clears screen.")
-    print("- exit: Exits program.")
-    print("- game: Plays the kanji game!")
-    print()
-
-
-def clear_screen():
-    """Uses the 'clear' option from the OS"""
-    if sys.platform == "linux":
-        subprocess.call("clear")
-    elif sys.platform == "win32":
-        subprocess.call("cls", shell=True)
-
-
-def game(jisho):
+def game(jisho, rounds):
     """Plays the random kanji game!"""
-    while True:
-        rounds = int(input("How many rounds do you want to play? "))   
-        if rounds > 0:
-            break
-
     correct = 0
     count = rounds
     while count > 0:
@@ -111,4 +71,5 @@ def game(jisho):
                 print("Incorrect!")
             print(kanji, "=", jisho[kanji].onyomi)
 
-    print(">> You got " + str(correct) + " out of " + str(rounds) + " (" + str(100*correct/rounds) + "%)!\n")
+    print(">> You got " + str(correct) + " out of " + str(rounds)
+          + " (" + str(100*correct/rounds) + "%)!\n")

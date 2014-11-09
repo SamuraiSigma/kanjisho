@@ -9,6 +9,7 @@ from jisho import search
 
 # Directory containing kanji files
 DIR = sys.path[0] + "/data/"
+ERROR = "Error when reading"
 
 
 def create_jisho(name, jisho):
@@ -22,14 +23,18 @@ def create_jisho(name, jisho):
             if line == "\n" or line.startswith('#'):
                 continue
 
-            # Reads info about the kanji
-            if i == 0:
-                data.append(line.rstrip('\n'))
-            elif i in (1, 3, 4):
-                data.append((line.rstrip('\n')).split(';'))
-            else:
-                data.append(int(line))
-            i += 1
+            # Reads info about the kanji; stops if an error is found
+            try:
+                if i == 0:
+                    data.append(line.rstrip('\n'))
+                elif i in (1, 3, 4):
+                    data.append((line.rstrip('\n')).split(';'))
+                else:
+                    data.append(int(line))
+                i += 1
+            except ValueError:
+                print(ERROR, name)
+                return
 
             # Adds kanji to dict
             if i == 5:
@@ -40,12 +45,22 @@ def create_jisho(name, jisho):
 
 # -------------------------------------------------------------------
 
-jisho = {}
+# Command line argument variables
+game_rounds = 0
+verbose = False
+
+for arg in sys.argv[1:]:
+    if arg.startswith("-g"):
+        game_rounds = int(arg[2:])
+    elif arg == "-v":
+        verbose = True
+
+jisho = {}  # Kanji dictionary
 
 try:
     for txt in os.listdir(DIR):
         create_jisho(DIR + txt, jisho)
-    search(jisho)
+    search(jisho, game_rounds, verbose)
 
 # Ctrl-C
 except KeyboardInterrupt:
