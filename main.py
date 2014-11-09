@@ -25,7 +25,7 @@ def create_jisho(name, jisho):
             # Reads info about the kanji
             if i == 0:
                 data.append(line.rstrip('\n'))
-            elif i == 1 or i == 3 or i == 4:
+            elif i in (1, 3, 4):
                 data.append((line.rstrip('\n')).split(';'))
             else:
                 data.append(int(line))
