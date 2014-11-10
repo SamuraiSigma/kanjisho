@@ -8,7 +8,7 @@ from kanji import Kanji
 from jisho import search
 
 # Directory containing kanji files
-DIR = sys.path[0] + "/data/"
+DIR = sys.path[0] + "/../data/"
 ERROR = "Error when reading"
 
 
@@ -43,14 +43,28 @@ def create_jisho(name, jisho):
                 i -= 5
 
 
+def usage():
+    """Shows how to use the program and leaves it"""
+    print("Usage:\n\t%s [-a] [-g<NUMBER>] [-v] [-h]" % sys.argv[0])
+    print("-a: Shows all kanji")
+    print("-g<NUMBER>: Plays NUMBER rounds of a kanji game, NUMBER > 0")
+    print("-v: Verbose mode (shows all info about a searched kanji)")
+    print("-h: Shows how to use the program and leaves it")
+    exit(1)
+
+
 # -------------------------------------------------------------------
 
 # Command line argument variables
+show_all = verbose = False
 game_rounds = 0
-verbose = False
 
 for arg in sys.argv[1:]:
-    if arg.startswith("-g"):
+    if arg == "-h":
+        usage()
+    elif arg == "-a":
+        show_all = True
+    elif arg.startswith("-g"):
         game_rounds = int(arg[2:])
     elif arg == "-v":
         verbose = True
@@ -60,7 +74,7 @@ jisho = {}  # Kanji dictionary
 try:
     for txt in os.listdir(DIR):
         create_jisho(DIR + txt, jisho)
-    search(jisho, game_rounds, verbose)
+    search(jisho, show_all, game_rounds, verbose)
 
 # Ctrl-C
 except KeyboardInterrupt:

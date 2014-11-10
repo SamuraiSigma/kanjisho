@@ -7,9 +7,11 @@ import romkan
 from kanji import Kanji
 
 
-def search(jisho, rounds, verbose):
+def search(jisho, all_mode, rounds, verbose):
     """Dictionary mode, where kanji previously read can be searched"""
-    if rounds > 0:
+    if all_mode:
+        show_all(jisho)
+    elif rounds > 0:
         game(jisho, rounds)
     else:
         for x in sys.argv[1:]:
@@ -34,6 +36,12 @@ def search(jisho, rounds, verbose):
                             print(kanji, "~>", katakana)
                         else:
                             jisho[kanji]()
+
+
+def show_all(jisho):
+    """Shows all kanji in the dictionary"""
+    for kanji in jisho:
+        jisho[kanji]()
 
 
 def game(jisho, rounds):
